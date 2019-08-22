@@ -58,7 +58,8 @@ https://zhuanlan.zhihu.com/p/64605565
         { 
             'dataset_list':
             {
-                 # 这里根据个人数据集的路径进行修改,该路径下含有label和images两个文件,分别存放放标注数据和图片
+                 # 这里根据个人数据集的路径进行修改,该路径下含有放在labelTxt下和images两个文件,分别存放放标注数据和图片
+                 # 这两个文件名可在在maskrcnn_benchmark/data/datasets/rotation_series.py中修改，见最后
                 'DOTA': '/media/clwclw/Elements/deep_learning/competion/2019yaogan/train/train_crop_800/'                         
             },
             "split": 'train'
