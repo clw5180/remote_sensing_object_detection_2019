@@ -1,0 +1,15 @@
+README.md
+rotation_setup.py
+setup.py
+RRPN.egg-info/PKG-INFO
+RRPN.egg-info/SOURCES.txt
+RRPN.egg-info/dependency_links.txt
+RRPN.egg-info/top_level.txt
+rotation/rbbox_overlaps.pyx
+rotation/rbbox_overlaps_kernel.cu
+rotation/rotate_circle_nms.pyx
+rotation/rotate_cython_nms.pyx
+rotation/rotate_gpu_nms.pyx
+rotation/rotate_nms_kernel.cu
+rotation/rotate_polygon_nms.pyx
+rotation/rotate_polygon_nms_kernel.cu

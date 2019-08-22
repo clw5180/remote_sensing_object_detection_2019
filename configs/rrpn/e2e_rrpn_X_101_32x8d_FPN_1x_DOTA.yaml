@@ -1,0 +1,94 @@
+INPUT:
+  MIN_SIZE_TRAIN: (800,) # TODO:关注一下输入图片resize的处理方式；个人感觉这样设置不会resize，不resize效果好一些。
+  MAX_SIZE_TRAIN: 800
+  MIN_SIZE_TEST: 800
+  MAX_SIZE_TEST: 800
+  #PIXEL_STD: [0.225, 0.224, 0.229] # TODO:defaults.py为[1., 1., 1.]
+  #TO_BGR255: False
+
+DATASETS:
+  #TRAIN: ("DOTA_train", )
+  TRAIN: ("RRPN_train", )
+
+MODEL:
+  META_ARCHITECTURE: "RRPN"
+  WEIGHT: "catalog://ImageNetPretrained/FAIR/20171220/X-101-32x8d"
+  #WEIGHT: "../tools/models/DOTA/model_0215000.pth"
+
+  BACKBONE:
+    CONV_BODY: "R-101-FPN"
+    OUT_CHANNELS: 256  # TODO：默认是256*4
+
+  #FPN:
+    #USE_GN: True  # TODO: add GroupNorm？
+
+  RPN:
+    USE_FPN: True
+    BATCH_SIZE_PER_IMAGE: 128
+    ANCHOR_SIZES: (32, 64, 128, 256, 512)
+    ANCHOR_STRIDE: (4, 8, 16, 32, 64)
+    ASPECT_RATIOS: (0.2, 0.33, 0.5, 1.0)
+
+    # Number of top scoring RPN proposals to keep after combining proposals from
+    # all FPN levels
+    # When FPN is used, this is *per FPN level* (not total)!!!!!!
+    PRE_NMS_TOP_N_TRAIN: 2000
+    PRE_NMS_TOP_N_TEST: 1000
+     # Number of top scoring RPN proposals to keep after applying NMS
+    POST_NMS_TOP_N_TEST: 1000
+    FPN_POST_NMS_TOP_N_TEST: 1000
+    RPN_HEAD: "SingleConvRRPNHead"
+
+  RRPN:
+    ANCHOR_SIZES: (2, 4, 8, 16, 32) # 参考 https://github.com/mjq11302010044/RRPN_pytorch/issues/15
+                                    # 作者:the ANCHOR_SIZES may be wrong, one setting can be (2, 4, 8, 16, 32), which represents the times of 16 on rbox edges
+    ASPECT_RATIOS: (0.2, 0.33, 0.5, 1.0)  # defaults为(0.2, 0.5, 1.0)
+    #ASPECT_RATIOS: (0.2, 0.33, 0.5, 1.0, 2.0, 3.0, 5.0)
+    ANCHOR_STRIDE: (4, 8, 16, 32, 64)  # clw note TODO: 之前为(16, )
+
+  #ROI_REC_HEAD:
+  #  NUM_CLASSES: 99  # clw note TODO:这个值没明白怎么来的
+  #  FEATURE_EXTRACTOR: "FPN2MLPFeatureExtractor" # clw note: 和ResNet101对应
+  #  PREDICTOR: "FPNPredictor"
+
+  ROI_HEADS:
+    USE_FPN: True
+    BATCH_SIZE_PER_IMAGE: 256 # clw note TODO: defaults中为512，但是RRPN这个项目给的256
+    DETECTIONS_PER_IMG: 2500 # clw note TODO: defaults中为100，这个是根据COCO数据集每幅图拥有的物体上限来的
+    NMS: 0.3
+
+  ROI_BOX_HEAD:
+    NUM_CLASSES: 19 # clw modify: origin = 2，defaults为81（for COCO）
+    #USE_GN: True   # TODO: add GroupNorm？
+    POOLER_RESOLUTION: 7  # clw note TODO：这个值包括下面2个都是参考fastern_rcnn_X_101_32x8d来的，defaults不是
+    POOLER_SAMPLING_RATIO: 2
+    POOLER_SCALES: (0.25, 0.125, 0.0625, 0.03125)
+    FEATURE_EXTRACTOR: "FPN2MLPFeatureExtractor" # clw note: 和ResNet101对应
+    PREDICTOR: "FPNPredictor"
+
+  RESNETS:
+    #STRIDE_IN_1X1: False  # clw note TODO：defaults为True,  # please set 'STRIDE_IN_1X1' to be 'False' when backbone uses GN
+    NUM_GROUPS: 32  # clw note：# Number of groups to use; 1 ==> ResNet; > 1 ==> ResNeXt
+    WIDTH_PER_GROUP: 8  # defaults为64
+#   clw note: paths_catalog.py文件中的配置，数据集指定时如果仅有一个数据集不要忘了逗号（如：("coco_2014_val",)）
+
+SOLVER:
+  BASE_LR: 0.005 # clw modify: RRPN作者给的0.005，默认0.001，考虑改小一点？不过有warmup
+  WEIGHT_DECAY: 0.0001
+  STEPS: (50000, 100000)  # clw note：defaults中为(30000,)
+  MAX_ITER: 140000  # clw modify:origin=150000
+
+  # # Number of images per batch
+  ## This is global, so if we have 8 GPUs and IMS_PER_BATCH = 16, each GPU will
+  ## see 2 images per batch
+  IMS_PER_BATCH: 1  # 很重要的设置，具体可以参见官网说明：https://github.com/facebookresearch/maskrcnn-benchmark/blob/master/README.md
+  CHECKPOINT_PERIOD: 5000  # 保存模型的间隔，defaults中就是5000，可以手动修改
+
+#TEST:
+#  IMS_PER_BATCH: 1 # clw note: defaults为2
+
+# 输出文件路径
+OUTPUT_DIR: './models/DOTA/'
+
+DATALOADER:
+  SIZE_DIVISIBILITY: 32
