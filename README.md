@@ -33,7 +33,7 @@ cd RRPN_pytorch
 # the following will install the lib with# symbolic links, so that you can modify
 # the files if you want and won't need to
 # re-build it
-python setup.py build develop（一定注意：后期若有修改maskrcnn-benchmark文件夹下的代码，一定要用这条命令重新编译！）
+python setup.py build develop（一定注意：后期若有修改maskrcnn-benchmark文件夹下的代码，一定要用这条命令重新编译！目的是同步build文件夹下的内容）
 
 # 后面这几步是RRPN项目特有的
 python rotation_setup.py install
@@ -49,49 +49,30 @@ https://github.com/facebookresearch/maskrcnn-benchmark
 https://zhuanlan.zhihu.com/p/64605565
 
 
+## 数据预处理
+采用800x800的crop，overlap取256，大约生成25000张图片。注意crop的同时要转换出对应的txt文件，放在labelTxt下。具体实现可以参考我的github，位置：Python_Practice/常用数据预处理脚本/超大图片crop/2019遥感_Step1_train_crop切图.py 
 
 ## 训练
-
-1、采用800x800的crop，overlap取256，大约生成25000张的图片。注意crop的同时要转换出对应的txt文件，放在labelTxt下。具体实现可以参考我的github，位置：Python_Practice/常用数据预处理脚本/超大图片crop/2019遥感_Step1_train_crop切图.py 
-
-2、在maskrcnn_benchmark/config/paths_catalog.py根据个人数据集的路径进行修改
-
-3、执行python setup.py build develop（只要maskrcnn_benchmark目录下任何文件修改,都需要做这一步，目的是同步build文件夹下的内容）
-
+1、在maskrcnn_benchmark/config/paths_catalog.py根据个人数据集的路径进行修改
 ```
-if __name__ == '__main__':
-    get_DOTA('train', '/media/clwclw/Elements/deep_learning/competion/2019yaogan/train/train_crop_800')  # 根据个人数据集的路径进行修改
-```
-
-```
-        "RRPN_train": {  # including IC13 and IC15
-            'dataset_list':{
-                'DOTA': '/media/clwclw/Elements/deep_learning/competion/2019yaogan/train/train_crop_800/' # 根据个人数据集的路径进行修改
+        "RRPN_train": 
+        { 
+            'dataset_list':
+            {
+                 # 这里根据个人数据集的路径进行修改,该路径下含有label和images两个文件,分别存放放标注数据和图片
+                'DOTA': '/media/clwclw/Elements/deep_learning/competion/2019yaogan/train/train_crop_800/'                         
             },
             "split": 'train'
         },
 ```
 
-```
-        elif "RRPN_train" in name:
-            data_dir = DatasetCatalog.DATA_DIR
-            attrs = DatasetCatalog.DATASETS['RRPN_train']
-            args = dict(
-                database=attrs["dataset_list"],
-            )
-            return dict(
-                factory="RotationDataset",
-                args=args,
-            )
-```
-
-4、tools文件夹下，执行python train_net.py
+2、tools文件夹下，执行python train_net.py
 
 
 
 ## 预测
 
-1、demo文件夹下，执行python RRPN_Demo.py
+在demo文件夹下，执行python RRPN_Demo.py
 
 主要是增加了在线crop，对bbox进行坐标变换，再用nms去掉overlap的重复检测框。
 
@@ -100,7 +81,6 @@ if __name__ == '__main__':
 ## 其他注意事项
 
 - 如果需要作一定修改，或者遇到问题，需要注意几点：
-
 1、我这里首先在maskrcnn_benchmark/data/datasets/rotation_series.py里自己写了一个获取数据集标注的方法get_DOTA()，主要是为了将DOTA数据集（也就是本次比赛的数据集）的标注数据以一定格式读进来，即下面的im_infos；
 
 ```
@@ -209,6 +189,16 @@ OUTPUT_DIR: './models/DOTA/'
 ```
 
 4、在maskrcnn_benchmark/data/datasets/rotation_series.py中需要修改的地方
+```
+def get_DOTA(mode, dataset_dir):
+    DATASET_DIR = dataset_dir
+    print('clw:在get_DOTA中, dataset_dir = ', dataset_dir)
+    
+    # 如果dataset_dir下存放标注数据和图片的文件夹名称不是images和labelTxt,可以在下面进行修改
+    img_dir = "/images/"  
+    gt_dir = "/labelTxt/" 
+
+```
 
 ```
 DATASET = {
@@ -243,7 +233,7 @@ class RotationDataset(torch.utils.data.Dataset):
         "baseball-diamond",
         "helipad",
         "airport",
-        "container-crane"  # 
+        "container-crane"  # 修改自己的类别
     )
 ```
 
