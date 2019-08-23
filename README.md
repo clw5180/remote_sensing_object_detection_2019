@@ -1,7 +1,7 @@
 # 2019年遥感图像稀疏表征与智能分析竞赛 - 目标检测主题
 比赛官网： http://rscup.bjxintong.com.cn/#/theme/2
 
-使用RRPN模型，ResNeXt-101-FPN作为backbone,mAP达到0.336（单模，无任何trick）。模型主要参考：https://github.com/mjq11302010044/RRPN_pytorch
+使用RRPN模型，ResNeXt-101-FPN作为backbone,mAP达到0.336（单模，由于最后时间不够未加任何trick）。模型主要参考：https://github.com/mjq11302010044/RRPN_pytorch ，需要针对本项目进行一定的修改。
 
 
 ## 环境搭建
@@ -238,7 +238,5 @@ class RotationDataset(torch.utils.data.Dataset):
 ```
 
 
-
-写得比较仓促，如有遗漏或者遇到问题可在issue提出，我会及时修正。
-
+写得比较仓促，如有遗漏或遇到问题欢迎提出宝贵issue，我会及时修正。
 欢迎star！
