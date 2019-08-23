@@ -77,6 +77,12 @@ https://zhuanlan.zhihu.com/p/64605565
 主要是增加了在线crop，对bbox进行坐标变换，再用nms去掉overlap的重复检测框。
 
 
+## 常见错误
+1、invalid value encountered in greater overlaps[overlaps > 1.00000001] = 0.0
+解决办法：
+（1）删除小于16x16（保险起见建议8x8）的bbox；
+（2）在代码中找到T.RandomRotation，注释掉。
+
 
 ## 其他注意事项
 
