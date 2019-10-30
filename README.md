@@ -244,5 +244,18 @@ class RotationDataset(torch.utils.data.Dataset):
 ```
 
 
+
+结果如下：
+
+![这里随便写文字](https://github.com/clw5180/remote_sensing_object_detection_2019/blob/master/screenshot/1.jpg)  
+
+
+
+![这里随便写文字](https://github.com/clw5180/remote_sensing_object_detection_2019/blob/master/screenshot/2.png) 
+
+
+
+
+
 写得比较仓促，如有遗漏或遇到问题欢迎提出宝贵issue，我会及时修正。
 欢迎star！
